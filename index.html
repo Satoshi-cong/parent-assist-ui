@@ -1467,13 +1467,13 @@ html { overscroll-behavior: none; }
       </div>
       <div class="assessment-content">
 
-        <!-- PCCS -->
+        <!-- 亲子沟通状态测评（PCCS-30 V2.0） -->
         <div class="assess-card" onclick="startAssessment('pccs')">
           <div class="assess-card-header">
             <div class="assess-icon-wrap" style="background:#EEF1FF">📋</div>
             <div class="assess-card-info">
-              <div class="assess-card-title">PCCS 亲子沟通量表</div>
-              <div class="assess-card-subtitle">评估亲子沟通模式与障碍点</div>
+              <div class="assess-card-title">亲子沟通状态测评</div>
+              <div class="assess-card-subtitle">PCCS-30 V2.0 · 5维度30题精准评估与预警</div>
             </div>
           </div>
           <div class="assess-card-meta">
@@ -1483,9 +1483,9 @@ html { overscroll-behavior: none; }
             <span class="assess-progress-text">已完成 65%</span>
           </div>
           <div class="assess-status-row">
-            <span class="badge badge-primary">30题深度版</span>
+            <span class="badge badge-primary">30题 · 4档计分</span>
             <span class="badge badge-success">✓ 已有报告</span>
-            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto">约15分钟</span>
+            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto">约8分钟</span>
           </div>
         </div>
 
@@ -1561,8 +1561,8 @@ html { overscroll-behavior: none; }
       <div class="aq-header">
         <div class="back-btn" onclick="backFromQuiz()">←</div>
         <div class="aq-header-info">
-          <div class="aq-header-title" id="aq-title">PCCS 亲子沟通量表</div>
-          <div class="aq-header-sub" id="aq-subtitle">深度版 · 30题</div>
+          <div class="aq-header-title" id="aq-title">亲子沟通状态测评</div>
+          <div class="aq-header-sub" id="aq-subtitle">PCCS-30 V2.0 · 30题</div>
         </div>
       </div>
       <div class="aq-progress-wrap">
@@ -1590,21 +1590,21 @@ html { overscroll-behavior: none; }
           <div class="back-btn" style="background:rgba(255,255,255,0.2);color:white" onclick="backToAssessment()">←</div>
           <div>
             <div class="report-header-title">测评报告</div>
-            <div class="report-header-sub" id="report-subtitle">PCCS 亲子沟通量表</div>
+            <div class="report-header-sub" id="report-subtitle">亲子沟通状态测评</div>
           </div>
         </div>
         <div class="report-score-row">
           <div class="report-score-item">
-            <div class="rsi-value">78</div>
+            <div class="rsi-value">74</div>
             <div class="rsi-label">综合得分</div>
           </div>
           <div class="report-score-item">
-            <div class="rsi-value">82%</div>
-            <div class="rsi-label">亲子匹配度</div>
+            <div class="rsi-value">/120</div>
+            <div class="rsi-label">量表满分</div>
           </div>
           <div class="report-score-item">
-            <div class="rsi-value" style="color:rgba(255,200,100,1)">良好</div>
-            <div class="rsi-label">关系状态</div>
+            <div class="rsi-value" style="color:var(--warning)">🟠 警示</div>
+            <div class="rsi-label">综合预警</div>
           </div>
         </div>
       </div>
@@ -1617,41 +1617,48 @@ html { overscroll-behavior: none; }
           </div>
           <div class="radar-wrap">
             <svg id="radar-svg" width="220" height="220" viewBox="0 0 220 220">
-              <!-- Background grid -->
-              <polygon points="110,20 194,65 194,155 110,200 26,155 26,65" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
-              <polygon points="110,42 178,79 178,141 110,178 42,141 42,79" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
-              <polygon points="110,64 162,93 162,127 110,156 58,127 58,93" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <!-- Background grid (5-sided) -->
+              <polygon points="110,20 201,76 166,175 54,175 19,76" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="110,42 189,85 160,160 60,160 31,85" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="110,64 177,94 154,145 66,145 43,94" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
               <!-- Axis lines -->
               <line x1="110" y1="20" x2="110" y2="200" stroke="#E8ECFA" stroke-width="1"/>
-              <line x1="26" y1="65" x2="194" y2="155" stroke="#E8ECFA" stroke-width="1"/>
-              <line x1="194" y1="65" x2="26" y2="155" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="201" y1="76" x2="19" y2="144" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="166" y1="175" x2="54" y2="45" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="54" y1="175" x2="166" y2="45" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="19" y1="76" x2="201" y2="144" stroke="#E8ECFA" stroke-width="1"/>
               <!-- Data polygon -->
-              <polygon id="radar-data" 
-                points="110,36 184,80 180,135 110,170 44,140 44,75"
+              <polygon id="radar-data"
+                points="110,36 195,80 160,165 62,155 35,82"
                 fill="rgba(79,110,247,0.15)" stroke="#4F6EF7" stroke-width="2.5" stroke-linejoin="round"/>
               <!-- Data points -->
               <circle cx="110" cy="36" r="4" fill="#4F6EF7"/>
-              <circle cx="184" cy="80" r="4" fill="#4F6EF7"/>
-              <circle cx="180" cy="135" r="4" fill="#4F6EF7"/>
-              <circle cx="110" cy="170" r="4" fill="#4F6EF7"/>
-              <circle cx="44" cy="140" r="4" fill="#4F6EF7"/>
-              <circle cx="44" cy="75" r="4" fill="#4F6EF7"/>
+              <circle cx="195" cy="80" r="4" fill="#4F6EF7"/>
+              <circle cx="160" cy="165" r="4" fill="#4F6EF7"/>
+              <circle cx="62" cy="155" r="4" fill="#4F6EF7"/>
+              <circle cx="35" cy="82" r="4" fill="#4F6EF7"/>
               <!-- Labels -->
-              <text x="110" y="12" text-anchor="middle" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">情感联结</text>
-              <text x="204" y="62" text-anchor="start" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">沟通质量</text>
-              <text x="204" y="162" text-anchor="start" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">边界设定</text>
-              <text x="110" y="215" text-anchor="middle" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">情绪管理</text>
-              <text x="16" y="162" text-anchor="end" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">信任度</text>
-              <text x="16" y="62" text-anchor="end" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">自主支持</text>
+              <text x="110" y="12" text-anchor="middle" font-size="9" fill="#6B7280" font-family="PingFang SC,sans-serif">情感依恋</text>
+              <text x="210" y="76" text-anchor="start" font-size="9" fill="#6B7280" font-family="PingFang SC,sans-serif">沟通开放</text>
+              <text x="172" y="188" text-anchor="start" font-size="9" fill="#6B7280" font-family="PingFang SC,sans-serif">情绪教练</text>
+              <text x="48" y="188" text-anchor="end" font-size="9" fill="#6B7280" font-family="PingFang SC,sans-serif">自主边界</text>
+              <text x="10" y="76" text-anchor="end" font-size="9" fill="#6B7280" font-family="PingFang SC,sans-serif">心智化</text>
             </svg>
           </div>
           <div class="dimension-bars">
-            <div class="dim-bar-item"><span class="dim-bar-label">情感联结</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:88%;background:var(--primary)"></div></div><span class="dim-bar-score">88</span></div>
-            <div class="dim-bar-item"><span class="dim-bar-label">沟通质量</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:75%;background:var(--primary)"></div></div><span class="dim-bar-score">75</span></div>
-            <div class="dim-bar-item"><span class="dim-bar-label">边界设定</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:72%;background:#7B5CF0"></div></div><span class="dim-bar-score">72</span></div>
-            <div class="dim-bar-item"><span class="dim-bar-label">情绪管理</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:65%;background:var(--accent)"></div></div><span class="dim-bar-score">65</span></div>
-            <div class="dim-bar-item"><span class="dim-bar-label">信任度</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:80%;background:var(--success)"></div></div><span class="dim-bar-score">80</span></div>
-            <div class="dim-bar-item"><span class="dim-bar-label">自主支持</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:58%;background:var(--warning)"></div></div><span class="dim-bar-score">58</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">情感依恋安全感</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:75%;background:var(--primary)"></div></div><span class="dim-bar-score">18</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">双向沟通开放性</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:50%;background:var(--warning)"></div></div><span class="dim-bar-score">12</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">修复与情绪教练</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:42%;background:var(--warning)"></div></div><span class="dim-bar-score">10</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">自主支持与边界</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:83%;background:var(--success)"></div></div><span class="dim-bar-score">20</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">镜映与心智化反馈</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:58%;background:#7B5CF0"></div></div><span class="dim-bar-score">14</span></div>
+          </div>
+          <!-- 预警等级说明 -->
+          <div style="margin-top:12px;padding:10px 12px;background:#FFF4E0;border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">🟠</span>
+            <div>
+              <div style="font-size:var(--font-sm);font-weight:600;color:var(--warning)">橙色警示</div>
+              <div style="font-size:var(--font-xs);color:var(--text-secondary);line-height:1.4">双向沟通与冲突修复维度偏低，建议立即采取行动改善</div>
+            </div>
           </div>
         </div>
 
@@ -1827,7 +1834,7 @@ html { overscroll-behavior: none; }
             <div class="timeline-item">
               <div class="timeline-dot green">✓</div>
               <div class="timeline-text">
-                <div class="timeline-title">完成PCCS测评，获得报告</div>
+                <div class="timeline-title">完成亲子沟通状态测评，获得报告</div>
                 <div class="timeline-date">2025年5月20日</div>
               </div>
             </div>
@@ -1913,7 +1920,7 @@ html { overscroll-behavior: none; }
         <div class="chat-bubble-wrap animate-in">
           <div class="chat-avatar ai-av">🤖</div>
           <div>
-            <div class="chat-bubble ai">你好，李明！我是你的AI家长助手 🌟<br><br>基于你的PCCS测评结果，我了解到你们目前存在「控制-反抗」型冲突模式。今天有什么想聊的吗？</div>
+            <div class="chat-bubble ai">你好，李明！我是你的AI家长助手 🌟<br><br>基于你的亲子沟通测评结果，我了解到你们目前存在「控制-反抗」型冲突模式。今天有什么想聊的吗？</div>
             <div class="chat-bubble-time">09:30</div>
           </div>
         </div>
@@ -2040,16 +2047,36 @@ const quizData = [
 
 const assessmentQuestions = {
   pccs: [
-    { q: '当孩子表达不同意见时，我能耐心倾听而不打断', opts: ['完全符合', '比较符合', '一般', '不太符合', '完全不符合'] },
-    { q: '我会主动询问孩子在学校发生了什么', opts: ['每天都会', '经常会', '有时会', '很少会', '从不'] },
-    { q: '当孩子犯错时，我更倾向于讲道理而非惩罚', opts: ['完全符合', '比较符合', '一般', '不太符合', '完全不符合'] },
-    { q: '我了解孩子最好的朋友是谁', opts: ['非常了解', '比较了解', '了解一些', '不太了解', '不了解'] },
-    { q: '孩子愿意向我倾诉烦恼和秘密', opts: ['经常如此', '有时如此', '偶尔', '很少', '从不'] },
-    { q: '当孩子成绩不好时，我会先了解原因再作反应', opts: ['总是这样', '经常这样', '有时这样', '很少这样', '从不这样'] },
-    { q: '我认为孩子的意见值得认真考虑', opts: ['完全同意', '同意', '说不准', '不太同意', '不同意'] },
-    { q: '家里的规则是和孩子共同商量制定的', opts: ['完全是', '大部分是', '一半一半', '大部分不是', '完全不是'] },
-    { q: '我能察觉到孩子情绪的细微变化', opts: ['很敏锐', '比较敏锐', '一般', '不太敏锐', '很迟钝'] },
-    { q: '我会在孩子达成目标时给予真诚的肯定', opts: ['总是', '经常', '有时', '很少', '从不'] },
+    { q: '当孩子情绪低落时，我能在几分钟内察觉到并主动关心', dim: '情感依恋安全感' },
+    { q: '孩子知道即使犯错或失败，我对他/她的爱也不会减少', dim: '情感依恋安全感' },
+    { q: '孩子愿意在我面前表现出脆弱的一面（如哭泣、承认害怕）', dim: '情感依恋安全感' },
+    { q: '我每天有至少15分钟完全专注于孩子、不被打扰的互动时间', dim: '情感依恋安全感' },
+    { q: '孩子离开我去做新事物时，会确认我"还在"，然后安心去探索', dim: '情感依恋安全感' },
+    { q: '孩子会用肢体语言表达亲近（如靠着我、牵手、拥抱），或主动找我聊天', dim: '情感依恋安全感' },
+    { q: '当孩子表达与我不同的观点时，我会耐心听完再回应，而非立即打断', dim: '双向沟通开放性' },
+    { q: '孩子愿意主动分享学校/生活中的琐事，而不只是回答我的提问', dim: '双向沟通开放性' },
+    { q: '我们能讨论敏感话题（如身体变化、恋爱、死亡等）而不尴尬或回避', dim: '双向沟通开放性' },
+    { q: '我在与孩子对话时，大部分时间是在倾听和提问，而非说教或给建议', dim: '双向沟通开放性' },
+    { q: '孩子会告诉我他/她的"秘密"或不想让别人知道的心事', dim: '双向沟通开放性' },
+    { q: '我们家庭有固定的"无电子设备"交流时间（如餐桌、睡前）', dim: '双向沟通开放性' },
+    { q: '当与孩子发生争执后，我们能在当天内和好，并讨论刚才发生了什么', dim: '修复与情绪教练' },
+    { q: '当孩子情绪激动时，我能帮助他/她识别并命名当下的情绪', dim: '修复与情绪教练' },
+    { q: '我在自己情绪激动时，能暂停对话而不是说出伤害孩子的话或做出过激行为', dim: '修复与情绪教练' },
+    { q: '孩子敢于在我面前表达不满或抗议，而不必担心被惩罚或冷落', dim: '修复与情绪教练' },
+    { q: '我们能就事论事讨论分歧，而不是翻旧账或对孩子进行人身攻击', dim: '修复与情绪教练' },
+    { q: '即使是我误解了孩子，我也愿意真诚地向孩子道歉', dim: '修复与情绪教练' },
+    { q: '在孩子的个人事务上（如穿衣、兴趣爱好、交友），我会尊重他/她的选择', dim: '自主支持与边界' },
+    { q: '我允许孩子在安全范围内犯错，并让他/她从后果中学习，而非提前阻止一切错误', dim: '自主支持与边界' },
+    { q: '我会向孩子解释家庭规则背后的原因，而非简单说"因为我是大人/这是为你好"', dim: '自主支持与边界' },
+    { q: '我不会私自查看孩子的手机、日记或私人物品，除非有明确的安全担忧并告知孩子', dim: '自主支持与边界' },
+    { q: '在家庭决策中，我会询问并认真考虑孩子的意见', dim: '自主支持与边界' },
+    { q: '我能区分"控制"（为了我的焦虑）和"合理边界"（为了孩子的安全/发展）', dim: '自主支持与边界' },
+    { q: '我每天都能具体地肯定孩子的某个行为或品质（如"你刚才很有耐心"），而非笼统说"你真棒"', dim: '镜映与心智化反馈' },
+    { q: '当孩子失败或受挫时，我首先给予情感支持，而非立即分析原因或提供解决方案', dim: '镜映与心智化反馈' },
+    { q: '我能发现并欣赏孩子独特的优点，即使这些优点不符合传统"优秀"标准', dim: '镜映与心智化反馈' },
+    { q: '我在指出孩子的问题时，会描述具体行为而非贴标签（如说"这个行为不对"而非"你是个坏孩子"）', dim: '镜映与心智化反馈' },
+    { q: '我会尝试理解孩子行为背后的动机和感受，而非仅看表面行为', dim: '镜映与心智化反馈' },
+    { q: '我不会拿孩子与其他孩子比较来激励他/她', dim: '镜映与心智化反馈' },
   ],
   'mbti-parent': [
     { q: '在聚会中，你更倾向于', opts: ['主动认识新朋友', '和老朋友深入交流', '两者都有', '独自观察场景', '尽快离开'] },
@@ -2261,7 +2288,7 @@ function startAssessment(type) {
   state.aqAnswers = [];
   const questions = assessmentQuestions[type] || assessmentQuestions.pccs;
   const names = {
-    'pccs': ['PCCS 亲子沟通量表', '深度版 · 10题'],
+    'pccs': ['亲子沟通状态测评', 'PCCS-30 V2.0 · 30题'],
     'mbti-parent': ['MBTI 家长性格测评', '精简版 · 8题'],
     'mbti-child': ['MBTI 孩子性格测评', '儿童版 · 5题'],
     'gift': ['天赋潜能测评', '专业版 · 5题'],
@@ -2294,11 +2321,13 @@ function renderAQ() {
   nextBtn.textContent = state.aqIndex < total - 1 ? '下一题' : '查看报告 🎉';
 
   const letters = ['A','B','C','D','E'];
+  const pccsScale = ['总是', '经常', '偶尔', '从不'];
+  const opts = (state.currentAssessment === 'pccs') ? pccsScale : (q.opts || pccsScale);
   document.getElementById('aq-content').innerHTML = `
-    <div class="aq-q-num animate-in">问题 ${state.aqIndex + 1}</div>
+    <div class="aq-q-num animate-in">问题 ${state.aqIndex + 1}${q.dim ? ' · ' + q.dim : ''}</div>
     <div class="aq-question animate-in">${q.q}</div>
     <div class="aq-options animate-in">
-      ${q.opts.map((opt, i) => `
+      ${opts.map((opt, i) => `
         <button class="aq-option ${selected === i ? 'selected' : ''}" onclick="selectAQOption(${i})">
           <span class="opt-letter">${letters[i]}</span>
           <span>${opt}</span>
@@ -2348,12 +2377,12 @@ function viewReport(e) {
 
 function showReport() {
   const names = {
-    'pccs': 'PCCS 亲子沟通量表',
+    'pccs': '亲子沟通状态测评',
     'mbti-parent': 'MBTI 家长性格测评',
     'mbti-child': 'MBTI 孩子性格测评',
     'gift': '天赋潜能测评',
   };
-  document.getElementById('report-subtitle').textContent = names[state.currentAssessment] || 'PCCS 亲子沟通量表';
+  document.getElementById('report-subtitle').textContent = names[state.currentAssessment] || '亲子沟通状态测评';
   showPage('report');
   document.getElementById('bottom-nav').classList.add('visible');
 }
