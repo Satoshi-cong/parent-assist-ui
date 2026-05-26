@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>家长助手 3.0</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+/* ===== CSS Design System ===== */
+:root {
+  --primary: #4F6EF7;
+  --primary-light: #EEF1FF;
+  --primary-dark: #3A56D4;
+  --accent: #FF7A59;
+  --accent-light: #FFF0EC;
+  --success: #34C759;
+  --success-light: #E8F8EE;
+  --warning: #FF9F0A;
+  --warning-light: #FFF4E0;
+  --danger: #FF3B30;
+  --bg: #F5F7FF;
+  --surface: #FFFFFF;
+  --surface2: #F0F2FA;
+  --text-primary: #1A1D2E;
+  --text-secondary: #6B7280;
+  --text-muted: #A0A8B8;
+  --border: #E8ECFA;
+  --shadow-sm: 0 2px 8px rgba(79,110,247,0.08);
+  --shadow-md: 0 4px 20px rgba(79,110,247,0.12);
+  --shadow-lg: 0 8px 32px rgba(79,110,247,0.18);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --font-xs: 11px;
+  --font-sm: 13px;
+  --font-base: 15px;
+  --font-md: 17px;
+  --font-lg: 20px;
+  --font-xl: 24px;
+  --font-2xl: 28px;
+  --font-3xl: 34px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+}
+
+/* Desktop: dark background with centered phone */
+@media (min-width: 500px) {
+  html, body {
+    background: #1A1D2E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* Mobile: full screen, no dark background */
+@media (max-width: 499px) {
+  html, body {
+    background: var(--bg);
+  }
+}
+
+/* ===== Phone Shell ===== */
+#phone-shell {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Desktop: phone mockup shell */
+@media (min-width: 500px) {
+  #phone-shell {
+    width: 375px;
+    height: 812px;
+    border-radius: 48px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
+  }
+}
+
+/* Mobile: full screen, no shell decoration */
+@media (max-width: 499px) {
+  #phone-shell {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Status bar */
+#status-bar {
+  height: 44px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px 0 20px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+/* Mobile: add safe area padding instead of fake status bar */
+@media (max-width: 499px) {
+  #status-bar {
+    height: auto;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: 4px;
+    min-height: 20px;
+  }
+  #status-bar .time,
+  #status-bar .icons { display: none; }
+}
+#status-bar .time { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+#status-bar .icons { display: flex; gap: 6px; align-items: center; }
+#status-bar .icons span { font-size: 14px; }
+
+/* App container */
+#app {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== Page Base ===== */
+html { overscroll-behavior: none; }
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  flex-direction: column;
+  background: var(--bg);
+  -webkit-overflow-scrolling: touch;
+}
+.page.active { display: flex; }
+
+/* ===== Bottom Navigation ===== */
+#bottom-nav {
+  height: 83px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: none;
+  align-items: flex-start;
+  padding-top: 8px;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 20px rgba(79,110,247,0.06);
+}
+#bottom-nav.visible { display: flex; }
+#bottom-nav .nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#bottom-nav .nav-item .nav-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: transform 0.2s;
+}
+#bottom-nav .nav-item .nav-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+#bottom-nav .nav-item.active .nav-label { color: var(--primary); }
+#bottom-nav .nav-item.active .nav-icon { transform: translateY(-1px); }
+
+/* ===== Scrollbar hide ===== */
+::-webkit-scrollbar { display: none; }
+
+/* Mobile: safe area for bottom nav */
+@media (max-width: 499px) {
+  #bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Desktop: show share hint badge */
+.share-hint { display: none; }
+@media (min-width: 500px) {
+  .share-hint { display: block; }
+}
+
+/* Mobile: ensure touch targets are big enough */
+@media (max-width: 499px) {
+  .quiz-option { min-height: 56px; }
+  .nav-item .nav-icon { width: 32px; height: 32px; font-size: 24px; }
+  .nav-item .nav-label { font-size: 12px; }
+}
+
+/* ===== Common Components ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.card-padding { padding: var(--space-md); }
+.section-title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+.badge-primary { background: var(--primary-light); color: var(--primary); }
+.badge-accent { background: var(--accent-light); color: var(--accent); }
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-base);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  outline: none;
+}
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 16px rgba(79,110,247,0.35);
+}
+.btn-primary:active { transform: scale(0.97); background: var(--primary-dark); }
+.btn-accent {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 16px rgba(255,122,89,0.35);
+}
+.btn-accent:active { transform: scale(0.97); }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.btn-ghost {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.btn-full { width: 100%; }
+
+/* ===== Onboarding / Quick Quiz ===== */
+#page-onboarding {
+  background: linear-gradient(160deg, #4F6EF7 0%, #7B5CF0 50%, #FF7A59 100%);
+}
+#page-onboarding .logo-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: var(--space-xl);
+}
+#page-onboarding .logo-icon {
+  width: 88px;
+  height: 88px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+#page-onboarding .logo-title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: white;
+}
+#page-onboarding .logo-sub {
+  font-size: var(--font-base);
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  line-height: 1.6;
+}
+#page-onboarding .start-btn-wrap {
+  padding: var(--space-xl);
+  padding-bottom: 40px;
+}
+.start-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--radius-lg);
+  background: white;
+  color: var(--primary);
+  font-size: var(--font-md);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+.start-btn:active { transform: scale(0.98); }
+
+/* Quick Quiz */
+#page-quiz {
+  background: var(--surface);
+  display: none;
+}
+#page-quiz.active { display: flex; }
+.quiz-progress-wrap {
+  padding: 20px var(--space-lg) 12px;
+  flex-shrink: 0;
+}
+.quiz-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.quiz-progress-header .qph-title {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.quiz-progress-header .qph-count {
+  font-size: var(--font-xs);
+  color: var(--primary);
+  font-weight: 700;
+}
+.quiz-progress-bar {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #7B5CF0);
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.quiz-content {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+}
+.quiz-emoji { font-size: 56px; text-align: center; margin-bottom: var(--space-lg); margin-top: var(--space-md); }
+.quiz-question {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+.quiz-subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  line-height: 1.5;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.quiz-option {
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.quiz-option:active { transform: scale(0.99); }
+.quiz-option.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.quiz-option .opt-icon { font-size: 22px; width: 32px; text-align: center; }
+.quiz-option .opt-text { font-size: var(--font-base); color: var(--text-primary); font-weight: 500; }
+.quiz-option.selected .opt-text { color: var(--primary); }
+.quiz-footer {
+  padding: var(--space-lg);
+  padding-top: var(--space-md);
+  flex-shrink: 0;
+}
+.skip-link {
+  display: block;
+  text-align: center;
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  margin-top: 12px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* ===== Home Page ===== */
+.home-header {
+  background: linear-gradient(135deg, #4F6EF7 0%, #6B7EF7 50%, #7B8FF7 100%);
+  padding: 20px var(--space-lg) var(--space-xl);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.home-header::before {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 160px;
+  height: 160px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.home-header::after {
+  content: '';
+  position: absolute;
+  right: 30px;
+  bottom: -50px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+.home-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+.home-greeting { color: rgba(255,255,255,0.85); font-size: var(--font-sm); }
+.home-name { color: white; font-size: var(--font-lg); font-weight: 700; margin-top: 2px; }
+.home-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+.health-index-card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.health-ring-wrap {
+  flex-shrink: 0;
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+.health-ring-wrap .ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.health-ring-wrap .ring-num {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}
+.health-ring-wrap .ring-unit {
+  font-size: var(--font-xs);
+  color: rgba(255,255,255,0.75);
+}
+.health-info { flex: 1; }
+.health-title { font-size: var(--font-md); font-weight: 700; color: white; margin-bottom: 4px; }
+.health-desc { font-size: var(--font-sm); color: rgba(255,255,255,0.8); line-height: 1.4; }
+.health-status-row {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 8px;
+}
+.health-status-item {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: var(--font-xs);
+  color: white;
+  font-weight: 500;
+}
+
+/* Home content */
+.home-content {
+  flex: 1;
+  padding: var(--space-md) var(--space-md) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.quick-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-sm);
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-xs);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.stat-value { font-size: var(--font-lg); font-weight: 800; color: var(--primary); }
+.stat-label { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 2px; }
+
+/* Conflict mode card */
+.conflict-card {
+  background: linear-gradient(135deg, #FFF8F5, #FFEFE9);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 4px solid var(--accent);
+}
+.conflict-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.conflict-card-title { font-size: var(--font-sm); font-weight: 700; color: var(--text-primary); }
+.conflict-mode-name {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.conflict-desc {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Today tasks */
+.today-tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.see-all { font-size: var(--font-sm); color: var(--primary); font-weight: 600; cursor: pointer; }
+.task-feed-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
+  margin-bottom: var(--space-sm);
+}
+.task-feed-card:active { transform: scale(0.99); }
+.task-feed-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.task-feed-body { flex: 1; }
+.task-feed-title { font-size: var(--font-base); font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.task-feed-meta { font-size: var(--font-xs); color: var(--text-muted); }
+.task-feed-right { flex-shrink: 0; }
+.check-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.check-circle.done {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+  font-size: 14px;
+}
+
+/* Quick entry cards */
+.quick-entries {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+.entry-card {
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.entry-card:active { transform: scale(0.98); }
+.entry-card-ai { background: linear-gradient(135deg, #4F6EF7, #7B5CF0); }
+.entry-card-kb { background: linear-gradient(135deg, #FF7A59, #FF9A59); }
+.entry-icon { font-size: 28px; margin-bottom: 8px; }
+.entry-title { font-size: var(--font-base); font-weight: 700; color: white; }
+.entry-sub { font-size: var(--font-xs); color: rgba(255,255,255,0.8); margin-top: 3px; }
+
+/* ===== Assessment Page ===== */
+.assessment-header {
+  background: var(--surface);
+  padding: 20px var(--space-lg) var(--space-md);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.assessment-header h1 { font-size: var(--font-xl); font-weight: 800; color: var(--text-primary); }
+.assessment-header p { font-size: var(--font-sm); color: var(--text-secondary); margin-top: 4px; }
+.assessment-content { flex: 1; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-md); overflow-y: auto; }
+.assess-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.assess-card:active { transform: scale(0.99); }
+.assess-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: 12px;
+}
+.assess-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.assess-card-info { flex: 1; }
+.assess-card-title { font-size: var(--font-md); font-weight: 700; color: var(--text-primary); }
+.assess-card-subtitle { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 3px; }
+.assess-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.assess-progress-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--surface2);
+  border-radius: 3px;
+  margin-right: var(--space-md);
+  overflow: hidden;
+}
+.assess-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.assess-progress-text { font-size: var(--font-xs); color: var(--text-secondary); white-space: nowrap; }
+.assess-status-row {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Quiz page (full assessment) */
+#page-assessment-quiz {
+  background: var(--surface);
+}
+.aq-header {
+  padding: 16px var(--space-lg) 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.back-btn:active { transform: scale(0.95); background: var(--border); }
+.aq-header-info { flex: 1; }
+.aq-header-title { font-size: var(--font-md); font-weight: 700; color: var(--text-primary); }
+.aq-header-sub { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 2px; }
+.aq-progress-wrap { padding: 12px var(--space-lg); flex-shrink: 0; }
+.aq-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+.aq-progress-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.aq-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #7B5CF0);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.aq-content {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.aq-q-num {
+  font-size: var(--font-xs);
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-sm);
+}
+.aq-question {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+.aq-options { display: flex; flex-direction: column; gap: 10px; }
+.aq-option {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.aq-option:active { transform: scale(0.99); }
+.aq-option .opt-letter {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.aq-option.selected { border-color: var(--primary); background: var(--primary-light); }
+.aq-option.selected .opt-letter { background: var(--primary); color: white; }
+.aq-option.selected { color: var(--primary); font-weight: 600; }
+.aq-footer {
+  padding: var(--space-md) var(--space-lg);
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Report Page */
+#page-report {
+  background: var(--bg);
+}
+.report-header {
+  background: linear-gradient(135deg, #4F6EF7, #7B5CF0);
+  padding: 20px var(--space-lg) var(--space-xl);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.report-header::before {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.report-header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-lg);
+}
+.report-header-title { font-size: var(--font-xl); font-weight: 800; color: white; }
+.report-header-sub { font-size: var(--font-sm); color: rgba(255,255,255,0.8); margin-top: 3px; }
+.report-score-row {
+  display: flex;
+  gap: var(--space-md);
+  position: relative;
+  z-index: 1;
+}
+.report-score-item {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.rsi-value { font-size: var(--font-xl); font-weight: 800; color: white; }
+.rsi-label { font-size: var(--font-xs); color: rgba(255,255,255,0.8); margin-top: 2px; }
+
+.report-content { flex: 1; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-md); overflow-y: auto; }
+.report-section { background: var(--surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-sm); }
+.report-section-title {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.report-section-title .section-icon { font-size: 18px; }
+
+/* Radar chart */
+.radar-wrap { display: flex; justify-content: center; }
+.dimension-bars { display: flex; flex-direction: column; gap: 10px; margin-top: var(--space-sm); }
+.dim-bar-item { display: flex; align-items: center; gap: 10px; }
+.dim-bar-label { font-size: var(--font-xs); color: var(--text-secondary); width: 60px; text-align: right; flex-shrink: 0; }
+.dim-bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.dim-bar-fill { height: 100%; border-radius: 4px; }
+.dim-bar-score { font-size: var(--font-xs); color: var(--text-primary); font-weight: 600; width: 28px; flex-shrink: 0; text-align: right; }
+
+/* Conflict analysis */
+.conflict-analysis-cards { display: flex; flex-direction: column; gap: 10px; }
+.ca-card {
+  padding: 12px var(--space-md);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ca-card-title { font-size: var(--font-sm); font-weight: 700; }
+.ca-card-desc { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 3px; line-height: 1.4; }
+
+/* Match score */
+.match-score-wrap { display: flex; align-items: center; gap: var(--space-lg); }
+.match-ring { flex-shrink: 0; }
+.match-info { flex: 1; }
+.match-title { font-size: var(--font-base); font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.match-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ===== Tasks Page ===== */
+.tasks-header {
+  background: var(--surface);
+  padding: 20px var(--space-lg) 0;
+  flex-shrink: 0;
+}
+.tasks-header h1 { font-size: var(--font-xl); font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-md); }
+.task-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.task-tab {
+  flex: 1;
+  padding: 12px 0;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  border-bottom: 2.5px solid transparent;
+  transition: all 0.2s;
+}
+.task-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tasks-content { flex: 1; overflow-y: auto; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-sm); }
+.task-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.task-card:active { transform: scale(0.99); }
+.task-card.completed { opacity: 0.7; }
+.task-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.task-card-title-wrap { flex: 1; }
+.task-card-title { font-size: var(--font-base); font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.task-card-type { font-size: var(--font-xs); color: var(--text-muted); }
+.task-completion-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: transparent;
+  margin-left: 8px;
+}
+.task-completion-btn.done {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+.task-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px; }
+.task-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.task-card-meta-row { display: flex; gap: var(--space-sm); align-items: center; }
+.task-meta-item { display: flex; align-items: center; gap: 4px; font-size: var(--font-xs); color: var(--text-muted); }
+.task-difficulty { display: flex; gap: 2px; }
+.task-difficulty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.task-difficulty-dot.active { background: var(--warning); }
+/* Theme week special */
+.task-card.theme-week {
+  background: linear-gradient(135deg, #F0F2FF, #E8EDFF);
+  border: 1px solid rgba(79,110,247,0.15);
+}
+.theme-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+/* Task detail */
+#page-task-detail { background: var(--bg); }
+.td-header {
+  padding: 16px var(--space-lg) var(--space-md);
+  background: var(--surface);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.td-header-info { flex: 1; }
+.td-header-title { font-size: var(--font-md); font-weight: 700; color: var(--text-primary); }
+.td-header-meta { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 3px; }
+.td-content { flex: 1; overflow-y: auto; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-md); }
+.td-section { background: var(--surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-sm); }
+.td-section-title { font-size: var(--font-base); font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+.step-list { display: flex; flex-direction: column; gap: 12px; }
+.step-item { display: flex; gap: 12px; align-items: flex-start; }
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-num.done { background: var(--success); color: white; }
+.step-text { font-size: var(--font-sm); color: var(--text-primary); line-height: 1.5; padding-top: 3px; }
+.checkin-area {
+  background: linear-gradient(135deg, var(--primary-light), #E8EDFF);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.checkin-area:active { transform: scale(0.99); }
+.checkin-icon { font-size: 36px; margin-bottom: 8px; }
+.checkin-title { font-size: var(--font-base); font-weight: 700; color: var(--primary); }
+.checkin-desc { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 4px; }
+.checkin-area.checked { background: linear-gradient(135deg, var(--success-light), #D4F4E0); }
+.checkin-area.checked .checkin-title { color: var(--success); }
+
+/* ===== Profile Page ===== */
+.profile-header {
+  background: linear-gradient(135deg, #4F6EF7, #7B5CF0);
+  padding: 24px var(--space-lg) 40px;
+  flex-shrink: 0;
+  position: relative;
+}
+.profile-user-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  position: relative;
+  z-index: 1;
+}
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  border: 3px solid rgba(255,255,255,0.4);
+}
+.profile-name { font-size: var(--font-xl); font-weight: 700; color: white; }
+.profile-role { font-size: var(--font-sm); color: rgba(255,255,255,0.8); margin-top: 3px; }
+.profile-edit-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  color: white;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+.profile-content { flex: 1; overflow-y: auto; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-md); margin-top: -20px; position: relative; z-index: 1; }
+.profile-card { background: var(--surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-md); }
+.profile-mbti-row { display: flex; gap: var(--space-sm); }
+.mbti-item {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-sm);
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+}
+.mbti-letter { font-size: var(--font-xl); font-weight: 800; color: var(--primary); }
+.mbti-label { font-size: var(--font-xs); color: var(--text-secondary); margin-top: 2px; }
+
+/* Growth timeline */
+.growth-timeline { display: flex; flex-direction: column; gap: 0; }
+.timeline-item { display: flex; gap: var(--space-md); padding-bottom: var(--space-md); position: relative; }
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 30px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+.timeline-dot.green { background: var(--success-light); }
+.timeline-dot.blue { background: var(--primary-light); }
+.timeline-dot.orange { background: var(--accent-light); }
+.timeline-text { flex: 1; padding-top: 4px; }
+.timeline-title { font-size: var(--font-sm); font-weight: 600; color: var(--text-primary); }
+.timeline-date { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+
+/* Settings list */
+.settings-list { display: flex; flex-direction: column; }
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.settings-label { flex: 1; font-size: var(--font-base); color: var(--text-primary); }
+.settings-arrow { color: var(--text-muted); font-size: 14px; }
+.settings-value { font-size: var(--font-sm); color: var(--text-muted); margin-right: 6px; }
+
+/* ===== AI Chat Page ===== */
+#page-ai-chat { background: var(--bg); }
+.ai-chat-header {
+  background: var(--surface);
+  padding: 16px var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.ai-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #7B5CF0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-bubble-wrap { display: flex; gap: 10px; }
+.chat-bubble-wrap.me { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.chat-avatar.ai-av { background: linear-gradient(135deg, var(--primary), #7B5CF0); }
+.chat-avatar.user-av { background: var(--surface2); }
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  line-height: 1.6;
+}
+.chat-bubble.ai { background: var(--surface); box-shadow: var(--shadow-sm); color: var(--text-primary); border-bottom-left-radius: 4px; }
+.chat-bubble.user { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+.chat-bubble-time { font-size: var(--font-xs); color: var(--text-muted); margin-top: 4px; text-align: right; }
+.ai-chat-input-wrap {
+  padding: 12px var(--space-md);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-end;
+}
+.chat-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: var(--font-sm);
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  max-height: 80px;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.chat-input:focus { border-color: var(--primary); }
+.chat-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.chat-send-btn:active { transform: scale(0.95); }
+.chat-suggestions { padding: 8px var(--space-md); display: flex; gap: var(--space-sm); overflow-x: auto; flex-shrink: 0; background: var(--surface); }
+.suggestion-chip {
+  padding: 7px 14px;
+  background: var(--primary-light);
+  border-radius: 20px;
+  font-size: var(--font-xs);
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.suggestion-chip:active { background: var(--primary); color: white; }
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeIn 0.3s ease forwards; }
+.animate-scale { animation: scaleIn 0.25s ease forwards; }
+.animate-slide { animation: slideUp 0.35s ease forwards; }
+
+/* Toast */
+#toast {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(26,29,46,0.9);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="phone-shell">
+  <!-- Status Bar -->
+  <div id="status-bar">
+    <span class="time" id="status-time">9:41</span>
+    <div class="icons">
+      <span>📶</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div id="app">
+
+    <!-- ==================== ONBOARDING PAGE ==================== -->
+    <div class="page active" id="page-onboarding">
+      <div class="logo-area animate-in">
+        <div class="logo-icon">🌟</div>
+        <div class="logo-title">家长助手</div>
+        <div class="logo-sub">读懂孩子，从了解自己开始<br>科学亲子沟通，成就更好的家庭</div>
+      </div>
+      <div class="start-btn-wrap">
+        <button class="start-btn" onclick="startQuiz()">开始使用 →</button>
+        <p style="text-align:center;font-size:var(--font-xs);color:rgba(255,255,255,0.5);margin-top:12px;">开始前需完成快速问答，约1分钟</p>
+      </div>
+    </div>
+
+    <!-- ==================== QUICK QUIZ PAGE ==================== -->
+    <div class="page" id="page-quiz">
+      <div class="quiz-progress-wrap">
+        <div class="quiz-progress-header">
+          <span class="qph-title">快速了解你 🎯</span>
+          <span class="qph-count" id="quiz-count-text">1 / 5</span>
+        </div>
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-fill" id="quiz-progress-fill" style="width:20%"></div>
+        </div>
+      </div>
+      <div class="quiz-content" id="quiz-content">
+        <!-- Dynamically rendered -->
+      </div>
+      <div class="quiz-footer">
+        <button class="btn btn-primary btn-full" id="quiz-next-btn" onclick="nextQuiz()" style="opacity:0.5;pointer-events:none">下一题</button>
+        <span class="skip-link" onclick="skipToHome()">跳过，直接体验</span>
+      </div>
+    </div>
+
+    <!-- ==================== HOME PAGE ==================== -->
+    <div class="page" id="page-home">
+      <!-- Header -->
+      <div class="home-header">
+        <div class="home-header-top">
+          <div>
+            <div class="home-greeting">早上好 ☀️</div>
+            <div class="home-name">李明，你好！</div>
+          </div>
+          <div class="home-avatar" onclick="showToast('查看通知')">🙋</div>
+        </div>
+        <div class="health-index-card">
+          <div class="health-ring-wrap">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="7"/>
+              <circle cx="36" cy="36" r="28" fill="none" stroke="white" stroke-width="7"
+                stroke-dasharray="175.9" stroke-dashoffset="42" stroke-linecap="round"
+                transform="rotate(-90 36 36)"/>
+            </svg>
+            <div class="ring-label">
+              <span class="ring-num">76</span>
+              <span class="ring-unit">分</span>
+            </div>
+          </div>
+          <div class="health-info">
+            <div class="health-title">亲子关系健康指数</div>
+            <div class="health-desc">比上周提升了 <strong style="color:rgba(255,255,255,1)">+4分</strong>，持续进步中！</div>
+            <div class="health-status-row">
+              <span class="health-status-item">沟通良好</span>
+              <span class="health-status-item">情绪稳定</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="home-content">
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card">
+            <div class="stat-value">12</div>
+            <div class="stat-label">完成任务</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--accent)">3</div>
+            <div class="stat-label">连续天数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--success)">82%</div>
+            <div class="stat-label">匹配度</div>
+          </div>
+        </div>
+
+        <!-- Conflict Mode -->
+        <div class="conflict-card animate-in">
+          <div class="conflict-card-header">
+            <span class="conflict-card-title">🔥 当前冲突模式</span>
+            <span class="badge badge-accent">需关注</span>
+          </div>
+          <div class="conflict-mode-name">「控制-反抗」型</div>
+          <div class="conflict-desc">孩子对学习自主性需求强，建议尝试"协商式"沟通策略，减少指令性语言。</div>
+        </div>
+
+        <!-- Today Tasks -->
+        <div>
+          <div class="today-tasks-header">
+            <span class="section-title" style="margin:0">今日任务</span>
+            <span class="see-all" onclick="switchTab('tasks')">查看全部</span>
+          </div>
+          <div id="home-task-feed">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Quick Entries -->
+        <div class="quick-entries">
+          <div class="entry-card entry-card-ai" onclick="goAIChat()">
+            <div class="entry-icon">🤖</div>
+            <div class="entry-title">AI 助手</div>
+            <div class="entry-sub">智能对话 · 实境模拟</div>
+          </div>
+          <div class="entry-card entry-card-kb" onclick="switchTab('assessment')">
+            <div class="entry-icon">📊</div>
+            <div class="entry-title">测评中心</div>
+            <div class="entry-sub">了解自己 · 读懂孩子</div>
+          </div>
+        </div>
+
+        <!-- Bottom spacing -->
+        <div style="height: 8px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== ASSESSMENT LIST PAGE ==================== -->
+    <div class="page" id="page-assessment">
+      <div class="assessment-header">
+        <h1>测评中心</h1>
+        <p>科学量表，精准洞察家庭关系</p>
+      </div>
+      <div class="assessment-content">
+
+        <!-- PCCS -->
+        <div class="assess-card" onclick="startAssessment('pccs')">
+          <div class="assess-card-header">
+            <div class="assess-icon-wrap" style="background:#EEF1FF">📋</div>
+            <div class="assess-card-info">
+              <div class="assess-card-title">PCCS 亲子沟通量表</div>
+              <div class="assess-card-subtitle">评估亲子沟通模式与障碍点</div>
+            </div>
+          </div>
+          <div class="assess-card-meta">
+            <div class="assess-progress-bar">
+              <div class="assess-progress-fill" style="width:65%;background:var(--primary)"></div>
+            </div>
+            <span class="assess-progress-text">已完成 65%</span>
+          </div>
+          <div class="assess-status-row">
+            <span class="badge badge-primary">30题深度版</span>
+            <span class="badge badge-success">✓ 已有报告</span>
+            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto">约15分钟</span>
+          </div>
+        </div>
+
+        <!-- MBTI Parent -->
+        <div class="assess-card" onclick="startAssessment('mbti-parent')">
+          <div class="assess-card-header">
+            <div class="assess-icon-wrap" style="background:#FFF0EC">🧠</div>
+            <div class="assess-card-info">
+              <div class="assess-card-title">MBTI 家长性格测评</div>
+              <div class="assess-card-subtitle">了解你的性格类型与教养风格</div>
+            </div>
+          </div>
+          <div class="assess-card-meta">
+            <div class="assess-progress-bar">
+              <div class="assess-progress-fill" style="width:100%;background:var(--success)"></div>
+            </div>
+            <span class="assess-progress-text">已完成</span>
+          </div>
+          <div class="assess-status-row">
+            <span class="badge badge-success">INFJ — 提倡者</span>
+            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto" onclick="viewReport(event)">查看报告 →</span>
+          </div>
+        </div>
+
+        <!-- MBTI Child -->
+        <div class="assess-card" onclick="startAssessment('mbti-child')">
+          <div class="assess-card-header">
+            <div class="assess-icon-wrap" style="background:#E8F8EE">👦</div>
+            <div class="assess-card-info">
+              <div class="assess-card-title">MBTI 孩子性格测评</div>
+              <div class="assess-card-subtitle">理解孩子的思维与行为方式</div>
+            </div>
+          </div>
+          <div class="assess-card-meta">
+            <div class="assess-progress-bar">
+              <div class="assess-progress-fill" style="width:0%;background:var(--primary)"></div>
+            </div>
+            <span class="assess-progress-text">未开始</span>
+          </div>
+          <div class="assess-status-row">
+            <span class="badge" style="background:#F5F7FF;color:var(--text-muted)">16题快测版</span>
+            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto">约8分钟</span>
+          </div>
+        </div>
+
+        <!-- Gift -->
+        <div class="assess-card" onclick="startAssessment('gift')">
+          <div class="assess-card-header">
+            <div class="assess-icon-wrap" style="background:#FFF4E0">🎯</div>
+            <div class="assess-card-info">
+              <div class="assess-card-title">天赋潜能测评</div>
+              <div class="assess-card-subtitle">发现孩子独特优势与学习风格</div>
+            </div>
+          </div>
+          <div class="assess-card-meta">
+            <div class="assess-progress-bar">
+              <div class="assess-progress-fill" style="width:0%;background:var(--warning)"></div>
+            </div>
+            <span class="assess-progress-text">未开始</span>
+          </div>
+          <div class="assess-status-row">
+            <span class="badge badge-warning">25题专业版</span>
+            <span style="font-size:var(--font-xs);color:var(--text-muted);margin-left:auto">约12分钟</span>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== ASSESSMENT QUIZ PAGE ==================== -->
+    <div class="page" id="page-assessment-quiz">
+      <div class="aq-header">
+        <div class="back-btn" onclick="backFromQuiz()">←</div>
+        <div class="aq-header-info">
+          <div class="aq-header-title" id="aq-title">PCCS 亲子沟通量表</div>
+          <div class="aq-header-sub" id="aq-subtitle">深度版 · 30题</div>
+        </div>
+      </div>
+      <div class="aq-progress-wrap">
+        <div class="aq-progress-meta">
+          <span id="aq-q-label">第 1 题</span>
+          <span id="aq-q-total" style="color:var(--primary);font-weight:700">1 / 10</span>
+        </div>
+        <div class="aq-progress-bar">
+          <div class="aq-progress-fill" id="aq-progress-fill" style="width:10%"></div>
+        </div>
+      </div>
+      <div class="aq-content" id="aq-content">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="aq-footer">
+        <button class="btn btn-outline" style="flex:1" onclick="aqPrev()" id="aq-prev-btn">上一题</button>
+        <button class="btn btn-primary" style="flex:2;opacity:0.5;pointer-events:none" id="aq-next-btn" onclick="aqNext()">下一题</button>
+      </div>
+    </div>
+
+    <!-- ==================== REPORT PAGE ==================== -->
+    <div class="page" id="page-report">
+      <div class="report-header">
+        <div class="report-header-top">
+          <div class="back-btn" style="background:rgba(255,255,255,0.2);color:white" onclick="backToAssessment()">←</div>
+          <div>
+            <div class="report-header-title">测评报告</div>
+            <div class="report-header-sub" id="report-subtitle">PCCS 亲子沟通量表</div>
+          </div>
+        </div>
+        <div class="report-score-row">
+          <div class="report-score-item">
+            <div class="rsi-value">78</div>
+            <div class="rsi-label">综合得分</div>
+          </div>
+          <div class="report-score-item">
+            <div class="rsi-value">82%</div>
+            <div class="rsi-label">亲子匹配度</div>
+          </div>
+          <div class="report-score-item">
+            <div class="rsi-value" style="color:rgba(255,200,100,1)">良好</div>
+            <div class="rsi-label">关系状态</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-content">
+        <!-- Radar Chart -->
+        <div class="report-section">
+          <div class="report-section-title">
+            <span class="section-icon">🎯</span> 维度分析
+          </div>
+          <div class="radar-wrap">
+            <svg id="radar-svg" width="220" height="220" viewBox="0 0 220 220">
+              <!-- Background grid -->
+              <polygon points="110,20 194,65 194,155 110,200 26,155 26,65" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="110,42 178,79 178,141 110,178 42,141 42,79" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="110,64 162,93 162,127 110,156 58,127 58,93" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <!-- Axis lines -->
+              <line x1="110" y1="20" x2="110" y2="200" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="26" y1="65" x2="194" y2="155" stroke="#E8ECFA" stroke-width="1"/>
+              <line x1="194" y1="65" x2="26" y2="155" stroke="#E8ECFA" stroke-width="1"/>
+              <!-- Data polygon -->
+              <polygon id="radar-data" 
+                points="110,36 184,80 180,135 110,170 44,140 44,75"
+                fill="rgba(79,110,247,0.15)" stroke="#4F6EF7" stroke-width="2.5" stroke-linejoin="round"/>
+              <!-- Data points -->
+              <circle cx="110" cy="36" r="4" fill="#4F6EF7"/>
+              <circle cx="184" cy="80" r="4" fill="#4F6EF7"/>
+              <circle cx="180" cy="135" r="4" fill="#4F6EF7"/>
+              <circle cx="110" cy="170" r="4" fill="#4F6EF7"/>
+              <circle cx="44" cy="140" r="4" fill="#4F6EF7"/>
+              <circle cx="44" cy="75" r="4" fill="#4F6EF7"/>
+              <!-- Labels -->
+              <text x="110" y="12" text-anchor="middle" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">情感联结</text>
+              <text x="204" y="62" text-anchor="start" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">沟通质量</text>
+              <text x="204" y="162" text-anchor="start" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">边界设定</text>
+              <text x="110" y="215" text-anchor="middle" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">情绪管理</text>
+              <text x="16" y="162" text-anchor="end" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">信任度</text>
+              <text x="16" y="62" text-anchor="end" font-size="10" fill="#6B7280" font-family="PingFang SC,sans-serif">自主支持</text>
+            </svg>
+          </div>
+          <div class="dimension-bars">
+            <div class="dim-bar-item"><span class="dim-bar-label">情感联结</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:88%;background:var(--primary)"></div></div><span class="dim-bar-score">88</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">沟通质量</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:75%;background:var(--primary)"></div></div><span class="dim-bar-score">75</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">边界设定</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:72%;background:#7B5CF0"></div></div><span class="dim-bar-score">72</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">情绪管理</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:65%;background:var(--accent)"></div></div><span class="dim-bar-score">65</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">信任度</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:80%;background:var(--success)"></div></div><span class="dim-bar-score">80</span></div>
+            <div class="dim-bar-item"><span class="dim-bar-label">自主支持</span><div class="dim-bar-track"><div class="dim-bar-fill" style="width:58%;background:var(--warning)"></div></div><span class="dim-bar-score">58</span></div>
+          </div>
+        </div>
+
+        <!-- Match Score -->
+        <div class="report-section">
+          <div class="report-section-title"><span class="section-icon">💞</span> 亲子匹配度</div>
+          <div class="match-score-wrap">
+            <div class="match-ring">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#E8ECFA" stroke-width="7"/>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#34C759" stroke-width="7"
+                  stroke-dasharray="201.1" stroke-dashoffset="36" stroke-linecap="round"
+                  transform="rotate(-90 40 40)"/>
+                <text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#1A1D2E" font-family="sans-serif">82%</text>
+              </svg>
+            </div>
+            <div class="match-info">
+              <div class="match-title">你与孩子的匹配程度较高</div>
+              <div style="font-size:var(--font-xs);color:var(--text-secondary);margin-bottom:8px;line-height:1.4">沟通风格基本相符，但在自主性边界上存在分歧</div>
+              <div class="match-tags">
+                <span class="badge badge-success">情感共鸣强</span>
+                <span class="badge badge-warning">边界待优化</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conflict Analysis -->
+        <div class="report-section">
+          <div class="report-section-title"><span class="section-icon">⚡</span> 冲突模式分析</div>
+          <div class="conflict-analysis-cards">
+            <div class="ca-card" style="border-color:var(--danger);background:#FFF5F5">
+              <div>
+                <div class="ca-card-title" style="color:var(--danger)">⚠️ 主要冲突：控制-反抗型</div>
+                <div class="ca-card-desc">家长倾向于高度管控学习行为，孩子产生逆反反应。建议增加协商机会，给予适当自主空间。</div>
+              </div>
+            </div>
+            <div class="ca-card" style="border-color:var(--warning);background:#FFFBF0">
+              <div>
+                <div class="ca-card-title" style="color:var(--warning)">⚡ 次要冲突：期望落差型</div>
+                <div class="ca-card-desc">成绩期望与孩子实际能力之间存在一定落差，需要重新校准学习目标。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="report-section">
+          <div class="report-section-title"><span class="section-icon">💡</span> AI 改善建议</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:var(--primary-light);border-radius:var(--radius-sm)">
+              <span style="font-size:20px">🗣️</span>
+              <div>
+                <div style="font-size:var(--font-sm);font-weight:600;color:var(--primary)">使用"你+我"沟通框架</div>
+                <div style="font-size:var(--font-xs);color:var(--text-secondary);margin-top:3px;line-height:1.4">用"我感到担心"替代"你怎么总是这样"，降低对抗性</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:var(--accent-light);border-radius:var(--radius-sm)">
+              <span style="font-size:20px">📅</span>
+              <div>
+                <div style="font-size:var(--font-sm);font-weight:600;color:var(--accent)">设立每周家庭会议</div>
+                <div style="font-size:var(--font-xs);color:var(--text-secondary);margin-top:3px;line-height:1.4">给孩子表达想法的固定时间，减少冲突积累</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== TASKS PAGE ==================== -->
+    <div class="page" id="page-tasks">
+      <div class="tasks-header">
+        <h1>任务中心</h1>
+        <div class="task-tabs">
+          <div class="task-tab active" data-tab="micro" onclick="switchTaskTab('micro', this)">微任务</div>
+          <div class="task-tab" data-tab="formal" onclick="switchTaskTab('formal', this)">正规任务</div>
+          <div class="task-tab" data-tab="theme" onclick="switchTaskTab('theme', this)">主题周</div>
+        </div>
+      </div>
+      <div class="tasks-content" id="tasks-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ==================== TASK DETAIL PAGE ==================== -->
+    <div class="page" id="page-task-detail">
+      <div class="td-header">
+        <div class="back-btn" onclick="backFromTaskDetail()">←</div>
+        <div class="td-header-info">
+          <div class="td-header-title" id="td-title">任务详情</div>
+          <div class="td-header-meta" id="td-meta">微任务 · 1-3天</div>
+        </div>
+      </div>
+      <div class="td-content" id="td-content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ==================== PROFILE PAGE ==================== -->
+    <div class="page" id="page-profile">
+      <div class="profile-header">
+        <div class="profile-user-row">
+          <div class="profile-avatar">👩</div>
+          <div>
+            <div class="profile-name">李明</div>
+            <div class="profile-role">妈妈 · 孩子：小明（10岁）</div>
+          </div>
+          <button class="profile-edit-btn" onclick="showToast('编辑功能开发中')">编辑</button>
+        </div>
+      </div>
+
+      <div class="profile-content">
+        <!-- MBTI Card -->
+        <div class="profile-card" style="margin-top:0">
+          <div style="font-size:var(--font-base);font-weight:700;color:var(--text-primary);margin-bottom:12px">🧠 MBTI 性格档案</div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:6px">家长（我）</div>
+            <div class="profile-mbti-row">
+              <div class="mbti-item"><div class="mbti-letter">I</div><div class="mbti-label">内向</div></div>
+              <div class="mbti-item"><div class="mbti-letter">N</div><div class="mbti-label">直觉</div></div>
+              <div class="mbti-item"><div class="mbti-letter">F</div><div class="mbti-label">情感</div></div>
+              <div class="mbti-item"><div class="mbti-letter">J</div><div class="mbti-label">判断</div></div>
+            </div>
+            <div style="font-size:var(--font-sm);color:var(--primary);font-weight:600;margin-top:8px;padding:8px;background:var(--primary-light);border-radius:var(--radius-sm)">
+              INFJ — 提倡者型 · 理想主义 · 有远见的共情者
+            </div>
+          </div>
+          <div>
+            <div style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:6px">孩子（小明）— 待测评</div>
+            <div style="padding:12px;background:var(--surface2);border-radius:var(--radius-sm);text-align:center;cursor:pointer" onclick="startAssessment('mbti-child');switchTab('assessment')">
+              <div style="font-size:20px;margin-bottom:6px">👦</div>
+              <div style="font-size:var(--font-sm);color:var(--text-secondary)">点击完成孩子性格测评，解锁匹配分析</div>
+              <div style="font-size:var(--font-xs);color:var(--primary);font-weight:600;margin-top:6px">开始测评 →</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Talent Radar -->
+        <div class="profile-card">
+          <div style="font-size:var(--font-base);font-weight:700;color:var(--text-primary);margin-bottom:12px">🌟 天赋潜能雷达</div>
+          <div style="display:flex;justify-content:center">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <polygon points="90,10 155,50 155,130 90,170 25,130 25,50" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="90,30 138,60 138,120 90,150 42,120 42,60" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="90,50 120,70 120,110 90,130 60,110 60,70" fill="none" stroke="#E8ECFA" stroke-width="1.5"/>
+              <polygon points="90,15 150,58 145,125 90,162 38,128 38,55"
+                fill="rgba(255,122,89,0.12)" stroke="#FF7A59" stroke-width="2" stroke-linejoin="round"/>
+              <circle cx="90" cy="15" r="3.5" fill="#FF7A59"/>
+              <circle cx="150" cy="58" r="3.5" fill="#FF7A59"/>
+              <circle cx="145" cy="125" r="3.5" fill="#FF7A59"/>
+              <circle cx="90" cy="162" r="3.5" fill="#FF7A59"/>
+              <circle cx="38" cy="128" r="3.5" fill="#FF7A59"/>
+              <circle cx="38" cy="55" r="3.5" fill="#FF7A59"/>
+              <text x="90" y="6" text-anchor="middle" font-size="9" fill="#6B7280" font-family="sans-serif">语言</text>
+              <text x="162" y="56" text-anchor="start" font-size="9" fill="#6B7280" font-family="sans-serif">逻辑</text>
+              <text x="162" y="132" text-anchor="start" font-size="9" fill="#6B7280" font-family="sans-serif">音乐</text>
+              <text x="90" y="177" text-anchor="middle" font-size="9" fill="#6B7280" font-family="sans-serif">空间</text>
+              <text x="18" y="132" text-anchor="end" font-size="9" fill="#6B7280" font-family="sans-serif">运动</text>
+              <text x="18" y="56" text-anchor="end" font-size="9" fill="#6B7280" font-family="sans-serif">人际</text>
+            </svg>
+          </div>
+          <div style="font-size:var(--font-xs);text-align:center;color:var(--text-muted);margin-top:4px">
+            待完成天赋测评后展示详细数据
+          </div>
+        </div>
+
+        <!-- Growth Timeline -->
+        <div class="profile-card">
+          <div style="font-size:var(--font-base);font-weight:700;color:var(--text-primary);margin-bottom:12px">📈 成长历程</div>
+          <div class="growth-timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot green">✓</div>
+              <div class="timeline-text">
+                <div class="timeline-title">完成PCCS测评，获得报告</div>
+                <div class="timeline-date">2025年5月20日</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot blue">🏆</div>
+              <div class="timeline-text">
+                <div class="timeline-title">连续完成3天微任务打卡</div>
+                <div class="timeline-date">2025年5月18日</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot orange">🌟</div>
+              <div class="timeline-text">
+                <div class="timeline-title">亲子关系指数首次突破75分</div>
+                <div class="timeline-date">2025年5月15日</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot green">🚀</div>
+              <div class="timeline-text">
+                <div class="timeline-title">完成MBTI测评，性格类型 INFJ</div>
+                <div class="timeline-date">2025年5月10日</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="profile-card">
+          <div style="font-size:var(--font-base);font-weight:700;color:var(--text-primary);margin-bottom:4px">⚙️ 设置</div>
+          <div class="settings-list">
+            <div class="settings-item" onclick="showToast('通知设置')">
+              <div class="settings-icon" style="background:#EEF1FF">🔔</div>
+              <span class="settings-label">消息通知</span>
+              <span class="settings-value">已开启</span>
+              <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="showToast('隐私设置')">
+              <div class="settings-icon" style="background:#E8F8EE">🔒</div>
+              <span class="settings-label">隐私与数据</span>
+              <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="showToast('日历同步')">
+              <div class="settings-icon" style="background:#FFF4E0">📅</div>
+              <span class="settings-label">日历同步</span>
+              <span class="settings-value">未开启</span>
+              <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="showToast('关于我们')">
+              <div class="settings-icon" style="background:#FFF0EC">ℹ️</div>
+              <span class="settings-label">关于家长助手</span>
+              <span class="settings-value">v3.0.0</span>
+              <span class="settings-arrow">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== AI CHAT PAGE ==================== -->
+    <div class="page" id="page-ai-chat">
+      <div class="ai-chat-header">
+        <div class="back-btn" onclick="backFromAIChat()">←</div>
+        <div class="ai-avatar">🤖</div>
+        <div style="flex:1;margin-left:8px">
+          <div style="font-size:var(--font-base);font-weight:700;color:var(--text-primary)">AI 家长助手</div>
+          <div style="font-size:var(--font-xs);color:var(--success);display:flex;align-items:center;gap:4px">
+            <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block"></span>在线
+          </div>
+        </div>
+        <div style="font-size:20px;cursor:pointer" onclick="showToast('查看历史对话')">📋</div>
+      </div>
+      <div class="chat-suggestions">
+        <span class="suggestion-chip" onclick="sendSuggestion('孩子最近不想学习怎么办？')">📚 学习动力</span>
+        <span class="suggestion-chip" onclick="sendSuggestion('如何与青春期孩子沟通？')">💬 青春期沟通</span>
+        <span class="suggestion-chip" onclick="sendSuggestion('孩子情绪崩溃我该怎么处理？')">😤 情绪管理</span>
+        <span class="suggestion-chip" onclick="sendSuggestion('模拟今晚与孩子讨论成绩的对话')">🎭 实境模拟</span>
+      </div>
+      <div class="ai-chat-messages" id="chat-messages">
+        <!-- Initial messages -->
+        <div class="chat-bubble-wrap animate-in">
+          <div class="chat-avatar ai-av">🤖</div>
+          <div>
+            <div class="chat-bubble ai">你好，李明！我是你的AI家长助手 🌟<br><br>基于你的PCCS测评结果，我了解到你们目前存在「控制-反抗」型冲突模式。今天有什么想聊的吗？</div>
+            <div class="chat-bubble-time">09:30</div>
+          </div>
+        </div>
+        <div class="chat-bubble-wrap animate-in" style="animation-delay:0.1s">
+          <div class="chat-avatar ai-av">🤖</div>
+          <div>
+            <div class="chat-bubble ai">你可以问我关于亲子沟通技巧、孩子行为解读、或者进行实境模拟对话 💬</div>
+            <div class="chat-bubble-time">09:30</div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-chat-input-wrap">
+        <textarea class="chat-input" id="chat-input" placeholder="输入你的问题..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="chat-send-btn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+  </div><!-- end #app -->
+
+  <!-- Bottom Navigation -->
+  <nav id="bottom-nav">
+    <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+      <div class="nav-icon">🏠</div>
+      <span class="nav-label">首页</span>
+    </div>
+    <div class="nav-item" data-tab="assessment" onclick="switchTab('assessment')">
+      <div class="nav-icon">📊</div>
+      <span class="nav-label">测评</span>
+    </div>
+    <div class="nav-item" data-tab="tasks" onclick="switchTab('tasks')">
+      <div class="nav-icon">✅</div>
+      <span class="nav-label">任务</span>
+    </div>
+    <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+      <div class="nav-icon">👤</div>
+      <span class="nav-label">我的</span>
+    </div>
+  </nav>
+
+</div><!-- end #phone-shell -->
+
+<script>
+'use strict';
+
+// ==================== State ====================
+const state = {
+  currentTab: 'onboarding',
+  currentTaskTab: 'micro',
+  quizIndex: 0,
+  quizAnswers: [],
+  aqIndex: 0,
+  aqAnswers: [],
+  currentAssessment: 'pccs',
+  homeTasks: [],
+  tasks: { micro: [], formal: [], theme: [] },
+  taskCheckStates: {},
+  currentTaskDetail: null,
+  chatHistory: [],
+  aiTyping: false,
+};
+
+// ==================== Mock Data ====================
+const quizData = [
+  {
+    emoji: '👨‍👩‍👧',
+    question: '你的家庭角色是？',
+    subtitle: '帮助我们为你定制个性化体验',
+    options: [
+      { icon: '👩', text: '妈妈' },
+      { icon: '👨', text: '爸爸' },
+      { icon: '👴', text: '爷爷/外公' },
+      { icon: '👵', text: '奶奶/外婆' },
+    ]
+  },
+  {
+    emoji: '🧒',
+    question: '孩子多大了？',
+    subtitle: '不同年龄段有不同的沟通策略',
+    options: [
+      { icon: '🍼', text: '3岁以下' },
+      { icon: '🎨', text: '3-6岁（学前）' },
+      { icon: '📚', text: '7-12岁（小学）' },
+      { icon: '🎸', text: '13-18岁（初高中）' },
+    ]
+  },
+  {
+    emoji: '⚡',
+    question: '和孩子最常发生的矛盾是？',
+    subtitle: '了解主要矛盾点，精准提供解决方案',
+    options: [
+      { icon: '📖', text: '学习/作业问题' },
+      { icon: '📱', text: '电子产品使用' },
+      { icon: '😤', text: '情绪与叛逆行为' },
+      { icon: '👫', text: '交友与社交问题' },
+    ]
+  },
+  {
+    emoji: '💬',
+    question: '你希望改善哪方面？',
+    subtitle: '我们将优先推荐相关内容',
+    options: [
+      { icon: '🗣️', text: '更好地表达关爱' },
+      { icon: '👂', text: '学会倾听孩子' },
+      { icon: '🤝', text: '建立信任关系' },
+      { icon: '🎯', text: '设定合理规则' },
+    ]
+  },
+  {
+    emoji: '🌟',
+    question: '你每周有多少时间陪伴孩子？',
+    subtitle: '帮助我们制定合理的任务计划',
+    options: [
+      { icon: '⏰', text: '少于5小时' },
+      { icon: '🕐', text: '5-10小时' },
+      { icon: '🗓️', text: '10-20小时' },
+      { icon: '🏡', text: '20小时以上' },
+    ]
+  }
+];
+
+const assessmentQuestions = {
+  pccs: [
+    { q: '当孩子表达不同意见时，我能耐心倾听而不打断', opts: ['完全符合', '比较符合', '一般', '不太符合', '完全不符合'] },
+    { q: '我会主动询问孩子在学校发生了什么', opts: ['每天都会', '经常会', '有时会', '很少会', '从不'] },
+    { q: '当孩子犯错时，我更倾向于讲道理而非惩罚', opts: ['完全符合', '比较符合', '一般', '不太符合', '完全不符合'] },
+    { q: '我了解孩子最好的朋友是谁', opts: ['非常了解', '比较了解', '了解一些', '不太了解', '不了解'] },
+    { q: '孩子愿意向我倾诉烦恼和秘密', opts: ['经常如此', '有时如此', '偶尔', '很少', '从不'] },
+    { q: '当孩子成绩不好时，我会先了解原因再作反应', opts: ['总是这样', '经常这样', '有时这样', '很少这样', '从不这样'] },
+    { q: '我认为孩子的意见值得认真考虑', opts: ['完全同意', '同意', '说不准', '不太同意', '不同意'] },
+    { q: '家里的规则是和孩子共同商量制定的', opts: ['完全是', '大部分是', '一半一半', '大部分不是', '完全不是'] },
+    { q: '我能察觉到孩子情绪的细微变化', opts: ['很敏锐', '比较敏锐', '一般', '不太敏锐', '很迟钝'] },
+    { q: '我会在孩子达成目标时给予真诚的肯定', opts: ['总是', '经常', '有时', '很少', '从不'] },
+  ],
+  'mbti-parent': [
+    { q: '在聚会中，你更倾向于', opts: ['主动认识新朋友', '和老朋友深入交流', '两者都有', '独自观察场景', '尽快离开'] },
+    { q: '做决策时，你更依赖', opts: ['直觉和感受', '事实和数据', '他人建议', '过去经验', '反复权衡'] },
+    { q: '面对变化，你通常', opts: ['兴奋期待', '保持平静', '谨慎观望', '抗拒不安', '顺其自然'] },
+    { q: '处理问题时，你的风格是', opts: ['逐步系统地分析', '整体直觉判断', '收集更多信息', '与人商量', '边做边想'] },
+    { q: '在家庭中，你更看重', opts: ['和谐的情感氛围', '清晰的规则秩序', '个体的自由发展', '共同的目标成就', '灵活的生活方式'] },
+    { q: '当家人有矛盾时，你首先', opts: ['分析谁对谁错', '安抚双方情绪', '避免冲突', '寻找解决方案', '等事情自然解决'] },
+    { q: '你更享受', opts: ['详细计划好的旅行', '随意探索的旅行', '介于两者之间', '一个人的旅行', '和家人的旅行'] },
+    { q: '对孩子的教育，你更强调', opts: ['品格和情感培养', '知识和技能训练', '自主探索学习', '规律和纪律', '兴趣和快乐'] },
+  ],
+  'mbti-child': [
+    { q: '孩子在学校更喜欢', opts: ['和很多同学玩', '和少数好朋友深聊', '独自思考探索', '参加各种活动', '观察周围环境'] },
+    { q: '孩子解决难题时倾向于', opts: ['按步骤逐一尝试', '突然产生新想法', '向大人或同学求助', '先不管直接做', '放弃换一道题'] },
+    { q: '孩子表达情绪时', opts: ['会清楚说出感受', '通过行动表达', '只说"还好"', '情绪变化很快', '很少表达'] },
+    { q: '孩子面对新任务时', opts: ['立刻充满热情', '先了解清楚再开始', '需要鼓励才动', '马上开始不管结果', '看情况决定'] },
+    { q: '孩子的学习方式', opts: ['喜欢阅读理解', '动手实践学得快', '需要他人讲解', '喜欢反复练习', '多种方式结合'] },
+  ],
+  gift: [
+    { q: '孩子最擅长的是', opts: ['语言表达和写作', '数学和逻辑推理', '绘画或音乐创作', '体育运动', '与人交往'] },
+    { q: '孩子花时间最多的是', opts: ['阅读和讲故事', '解谜和数学游戏', '艺术创作', '运动和游戏', '与朋友互动'] },
+    { q: '当孩子遇到挑战时', opts: ['主动探索解决', '寻求帮助', '坚持反复尝试', '跳过换其他', '和他人一起解决'] },
+    { q: '孩子在哪方面进步最快', opts: ['语文成绩', '数学成绩', '艺术/音乐', '体育', '班级事务参与'] },
+    { q: '孩子最引以为傲的能力是', opts: ['讲话说服力强', '计算很快很准', '创造力丰富', '运动协调好', '很受同学喜爱'] },
+  ]
+};
+
+const tasksData = {
+  micro: [
+    { id: 1, title: '今日正面反馈练习', type: '微任务', desc: '今天至少给孩子3次真诚的正面反馈，关注行为而非结果', duration: '今天', difficulty: 2, tags: ['沟通', '情感'], steps: ['观察孩子的一个具体行为', '描述你看到的行为（不评价）', '表达你的感受和欣赏', '观察孩子的反应'] },
+    { id: 2, title: '倾听练习：10分钟专注对话', type: '微任务', desc: '放下手机，全神贯注地和孩子聊10分钟，只听不评判', duration: '今天', difficulty: 1, tags: ['倾听'], steps: ['选择孩子放学后或晚饭后', '找安静的地方坐下来', '让孩子选择话题', '全程点头回应，不打断，不建议', '结束时告诉孩子你很高兴听到这些'] },
+    { id: 3, title: '情绪瓶子：写下今日感受', type: '微任务', desc: '写下今天和孩子互动中你的情绪记录，2-3句话即可', duration: '今天', difficulty: 1, tags: ['情绪', '反思'], steps: ['回顾今天与孩子的互动', '写下1-2个情绪关键词', '简单记录触发场景', '思考下次可以如何回应'] },
+    { id: 4, title: '睡前5分钟连接仪式', type: '微任务', desc: '在孩子睡前进行5分钟有质量的聊天，用开放式问题', duration: '今晚', difficulty: 1, tags: ['连接', '习惯'], steps: ['孩子准备睡觉前5分钟', '问"今天有什么让你开心的事？"', '问"有什么让你烦恼的事吗？"', '给孩子一个晚安拥抱'] },
+  ],
+  formal: [
+    { id: 5, title: '「协商式规则」重建计划', type: '正规任务', desc: '用2周时间重新建立家庭规则体系，以协商取代命令', duration: '2周', difficulty: 3, tags: ['规则', '自主性'], steps: ['第1-2天：列出现有规则清单', '第3-5天：与孩子讨论各规则的意义', '第6-8天：共同修订3条规则', '第9-11天：试行新规则', '第12-14天：复盘评估效果'] },
+    { id: 6, title: '每周家庭会议习惯养成', type: '正规任务', desc: '建立固定的家庭会议制度，每周一次，30分钟，民主讨论', duration: '4周', difficulty: 2, tags: ['习惯', '民主'], steps: ['确定固定会议时间（如周日晚8点）', '准备简单的议程模板', '第1次：介绍规则，互相表达感谢', '第2-4次：讨论本周事项', '持续每周进行'] },
+    { id: 7, title: '非暴力沟通（NVC）21天练习', type: '正规任务', desc: '学习并实践观察-感受-需要-请求四步骤沟通框架', duration: '3周', difficulty: 3, tags: ['NVC', '沟通'], steps: ['第1周：学习"观察 vs 评价"', '第2周：练习表达感受（非想法）', '第3周：用"请求"替代"要求"', '每天记录一次实践案例'] },
+  ],
+  theme: [
+    { id: 8, title: '🎨 创意亲子周：共创家庭故事', type: '主题周', desc: '本周以"创意表达"为主题，每天用不同艺术形式和孩子一起记录家庭故事', duration: '本周（7天）', difficulty: 2, tags: ['创意', '亲子', '艺术'], isTheme: true, days: ['周一：画出今天心情', '周二：用5个词描述家人', '周三：拍一张"家"的照片', '周四：一起做一道菜', '周五：写一首小诗', '周六：合唱一首歌', '周日：分享本周最美好的瞬间'] },
+    { id: 9, title: '💪 成长挑战周：自主管理', type: '主题周', desc: '本周让孩子尝试自主管理，家长从监督者变成支持者', duration: '下周（7天）', difficulty: 3, tags: ['自主', '成长'], isTheme: true, days: ['周一：孩子自己制定作业计划', '周二：孩子安排晚饭后时间', '周三：孩子选择第二天穿什么', '周四：孩子规划周末活动', '周五：复盘本周自主尝试', '周六：家长给予书面反馈', '周日：设定下周新挑战'] },
+  ]
+};
+
+const aiResponses = {
+  '孩子最近不想学习怎么办？': '理解你的担心！孩子不想学习通常有几个根源：\n\n1. **外部压力过大** — 检查是否给了太多目标\n2. **缺乏成就感** — 任务是否太难或太简单\n3. **情感需求未被满足** — 先连接，再纠正\n\n基于你的测评，你们存在"控制-反抗"模式，建议先问孩子："什么科目你最有成就感？"从兴趣点切入 💡',
+  '如何与青春期孩子沟通？': '青春期是孩子建立独立身份的关键期，冲突其实是健康发展的信号！\n\n**有效策略：**\n• 把"你应该"换成"我想了解你的想法"\n• 每次对话前做3次深呼吸\n• 接受沉默——孩子可能只是需要时间\n• 在孩子主动时100%在场，不刷手机\n\n需要我模拟一段青春期对话吗？🎭',
+  '孩子情绪崩溃我该怎么处理？': '情绪崩溃时，大脑的理性区域是关闭的，说道理完全无效！\n\n**5步应急方案：**\n1. 保持自己冷静（你的情绪是镜子）\n2. 靠近但不强迫抱抱\n3. 说"我看到你现在很难受"\n4. 陪伴等待情绪平息（不说话）\n5. 等孩子平静后，再聊刚才发生了什么\n\n记住：**接纳情绪 ≠ 接受行为** 🫂',
+  '模拟今晚与孩子讨论成绩的对话': '好的，我来扮演孩子，你来练习。场景：孩子这次考试只考了65分...\n\n**孩子（我）：** 妈妈/爸爸，成绩单出来了... 我考得不太好。\n\n（请你回复——记住用NVC框架：观察→感受→需要→请求）💬\n\n你会怎么回应？我会给你反馈！'
+};
+
+// ==================== Time Update ====================
+function updateTime() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  document.getElementById('status-time').textContent = `${h}:${m}`;
+}
+updateTime();
+setInterval(updateTime, 30000);
+
+// ==================== Toast ====================
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ==================== Page Navigation ====================
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+}
+
+const mainTabs = ['home', 'assessment', 'tasks', 'profile'];
+
+function switchTab(tab) {
+  state.currentTab = tab;
+  showPage(tab);
+  // Update bottom nav
+  document.querySelectorAll('#bottom-nav .nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.tab === tab);
+  });
+  document.getElementById('bottom-nav').classList.add('visible');
+  // Render content
+  if (tab === 'home') renderHomeTasks();
+  if (tab === 'tasks') renderTasks();
+}
+
+// ==================== Onboarding / Quiz ====================
+function startQuiz() {
+  showPage('quiz');
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const q = quizData[state.quizIndex];
+  const total = quizData.length;
+  const pct = ((state.quizIndex + 1) / total * 100).toFixed(0);
+
+  document.getElementById('quiz-count-text').textContent = `${state.quizIndex + 1} / ${total}`;
+  document.getElementById('quiz-progress-fill').style.width = pct + '%';
+
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.style.opacity = '0.5';
+  nextBtn.style.pointerEvents = 'none';
+  nextBtn.textContent = state.quizIndex < total - 1 ? '下一题' : '完成 🎉';
+
+  const content = document.getElementById('quiz-content');
+  content.innerHTML = `
+    <div class="quiz-emoji animate-in">${q.emoji}</div>
+    <div class="quiz-question animate-in">${q.question}</div>
+    <div class="quiz-subtitle animate-in">${q.subtitle}</div>
+    <div class="quiz-options animate-in" id="quiz-opts">
+      ${q.options.map((opt, i) => `
+        <div class="quiz-option" data-idx="${i}" onclick="selectQuizOption(this)">
+          <span class="opt-icon">${opt.icon}</span>
+          <span class="opt-text">${opt.text}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function selectQuizOption(el) {
+  document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.quizAnswers[state.quizIndex] = parseInt(el.dataset.idx);
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.style.opacity = '1';
+  nextBtn.style.pointerEvents = 'auto';
+}
+
+function nextQuiz() {
+  if (state.quizAnswers[state.quizIndex] === undefined) return;
+  if (state.quizIndex < quizData.length - 1) {
+    state.quizIndex++;
+    renderQuiz();
+  } else {
+    finishQuiz();
+  }
+}
+
+function skipToHome() {
+  enterMainApp();
+}
+
+function finishQuiz() {
+  showToast('快问快答完成！正在分析...');
+  setTimeout(() => enterMainApp(), 800);
+}
+
+function enterMainApp() {
+  switchTab('home');
+}
+
+// ==================== Home Page ====================
+function renderHomeTasks() {
+  const feedData = [
+    { id: 1, icon: '🗣️', color: '#EEF1FF', title: '今日正面反馈练习', meta: '微任务 · 约15分钟', done: false },
+    { id: 2, icon: '👂', color: '#E8F8EE', title: '10分钟专注倾听', meta: '微任务 · 约10分钟', done: true },
+    { id: 3, icon: '📝', color: '#FFF4E0', title: '情绪记录打卡', meta: '习惯养成 · 今日', done: false },
+  ];
+  const html = feedData.map(t => `
+    <div class="task-feed-card animate-in" onclick="openTaskFromHome(${t.id})">
+      <div class="task-feed-icon" style="background:${t.color}">${t.icon}</div>
+      <div class="task-feed-body">
+        <div class="task-feed-title" style="${t.done ? 'text-decoration:line-through;color:var(--text-muted)' : ''}">${t.title}</div>
+        <div class="task-feed-meta">${t.meta}</div>
+      </div>
+      <div class="task-feed-right">
+        <div class="check-circle ${t.done ? 'done' : ''}" onclick="toggleHomTask(event, ${t.id}, this)">
+          ${t.done ? '✓' : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('home-task-feed').innerHTML = html;
+}
+
+function toggleHomTask(e, id, el) {
+  e.stopPropagation();
+  const isDone = el.classList.toggle('done');
+  if (isDone) { el.innerHTML = '✓'; showToast('🎉 完成了！'); }
+  else { el.innerHTML = ''; }
+  // Update title decoration
+  const card = el.closest('.task-feed-card');
+  const titleEl = card.querySelector('.task-feed-title');
+  titleEl.style.textDecoration = isDone ? 'line-through' : '';
+  titleEl.style.color = isDone ? 'var(--text-muted)' : '';
+}
+
+function openTaskFromHome(id) {
+  const task = tasksData.micro.find(t => t.id === id) || tasksData.formal.find(t => t.id === id);
+  if (task) openTaskDetail(task);
+}
+
+// ==================== Assessment ====================
+function startAssessment(type) {
+  state.currentAssessment = type;
+  state.aqIndex = 0;
+  state.aqAnswers = [];
+  const questions = assessmentQuestions[type] || assessmentQuestions.pccs;
+  const names = {
+    'pccs': ['PCCS 亲子沟通量表', '深度版 · 10题'],
+    'mbti-parent': ['MBTI 家长性格测评', '精简版 · 8题'],
+    'mbti-child': ['MBTI 孩子性格测评', '儿童版 · 5题'],
+    'gift': ['天赋潜能测评', '专业版 · 5题'],
+  };
+  const info = names[type] || names.pccs;
+  document.getElementById('aq-title').textContent = info[0];
+  document.getElementById('aq-subtitle').textContent = info[1];
+  renderAQ();
+  showPage('assessment-quiz');
+}
+
+function renderAQ() {
+  const questions = assessmentQuestions[state.currentAssessment] || [];
+  const total = questions.length;
+  const q = questions[state.aqIndex];
+  const pct = ((state.aqIndex + 1) / total * 100).toFixed(0);
+
+  document.getElementById('aq-q-label').textContent = `第 ${state.aqIndex + 1} 题`;
+  document.getElementById('aq-q-total').textContent = `${state.aqIndex + 1} / ${total}`;
+  document.getElementById('aq-progress-fill').style.width = pct + '%';
+
+  const prevBtn = document.getElementById('aq-prev-btn');
+  const nextBtn = document.getElementById('aq-next-btn');
+  prevBtn.disabled = state.aqIndex === 0;
+  prevBtn.style.opacity = state.aqIndex === 0 ? '0.4' : '1';
+
+  const selected = state.aqAnswers[state.aqIndex];
+  nextBtn.style.opacity = (selected !== undefined) ? '1' : '0.5';
+  nextBtn.style.pointerEvents = (selected !== undefined) ? 'auto' : 'none';
+  nextBtn.textContent = state.aqIndex < total - 1 ? '下一题' : '查看报告 🎉';
+
+  const letters = ['A','B','C','D','E'];
+  document.getElementById('aq-content').innerHTML = `
+    <div class="aq-q-num animate-in">问题 ${state.aqIndex + 1}</div>
+    <div class="aq-question animate-in">${q.q}</div>
+    <div class="aq-options animate-in">
+      ${q.opts.map((opt, i) => `
+        <button class="aq-option ${selected === i ? 'selected' : ''}" onclick="selectAQOption(${i})">
+          <span class="opt-letter">${letters[i]}</span>
+          <span>${opt}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function selectAQOption(idx) {
+  state.aqAnswers[state.aqIndex] = idx;
+  renderAQ();
+}
+
+function aqPrev() {
+  if (state.aqIndex > 0) {
+    state.aqIndex--;
+    renderAQ();
+  }
+}
+
+function aqNext() {
+  if (state.aqAnswers[state.aqIndex] === undefined) return;
+  const questions = assessmentQuestions[state.currentAssessment] || [];
+  if (state.aqIndex < questions.length - 1) {
+    state.aqIndex++;
+    renderAQ();
+  } else {
+    showReport();
+  }
+}
+
+function backFromQuiz() {
+  showPage('assessment');
+  document.getElementById('bottom-nav').classList.add('visible');
+}
+
+function backToAssessment() {
+  showPage('assessment');
+  document.getElementById('bottom-nav').classList.add('visible');
+}
+
+function viewReport(e) {
+  e.stopPropagation();
+  showReport();
+}
+
+function showReport() {
+  const names = {
+    'pccs': 'PCCS 亲子沟通量表',
+    'mbti-parent': 'MBTI 家长性格测评',
+    'mbti-child': 'MBTI 孩子性格测评',
+    'gift': '天赋潜能测评',
+  };
+  document.getElementById('report-subtitle').textContent = names[state.currentAssessment] || 'PCCS 亲子沟通量表';
+  showPage('report');
+  document.getElementById('bottom-nav').classList.add('visible');
+}
+
+// ==================== Tasks Page ====================
+function renderTasks() {
+  const data = tasksData[state.currentTaskTab] || [];
+  const html = data.map(task => {
+    const isDone = state.taskCheckStates[task.id] || false;
+    const diffDots = [1,2,3].map(n =>
+      `<div class="task-difficulty-dot ${n <= task.difficulty ? 'active' : ''}"></div>`
+    ).join('');
+    const tags = (task.tags || []).map(t => `<span class="badge badge-primary">${t}</span>`).join('');
+    if (task.isTheme) {
+      return `
+        <div class="task-card theme-week animate-in" onclick="openTaskDetail(tasksData.theme.find(t=>t.id===${task.id}))">
+          <span class="theme-badge">主题周</span>
+          <div class="task-card-header">
+            <div class="task-card-title-wrap">
+              <div class="task-card-title">${task.title}</div>
+              <div class="task-card-type">${task.duration}</div>
+            </div>
+          </div>
+          <div class="task-card-desc">${task.desc}</div>
+          <div class="task-card-footer">
+            <div class="task-card-meta-row">${tags}</div>
+            <div class="task-difficulty">${diffDots}</div>
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="task-card ${isDone ? 'completed' : ''} animate-in" onclick="openTaskDetailById(${task.id})">
+        <div class="task-card-header">
+          <div class="task-card-title-wrap">
+            <div class="task-card-title" style="${isDone ? 'text-decoration:line-through;color:var(--text-muted)' : ''}">${task.title}</div>
+            <div class="task-card-type">${task.type} · ${task.duration}</div>
+          </div>
+          <button class="task-completion-btn ${isDone ? 'done' : ''}" onclick="toggleTask(event,${task.id},this)">
+            ${isDone ? '✓' : ''}
+          </button>
+        </div>
+        <div class="task-card-desc">${task.desc}</div>
+        <div class="task-card-footer">
+          <div class="task-card-meta-row">${tags}</div>
+          <div class="task-difficulty">${diffDots}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('tasks-list').innerHTML = html || '<div style="text-align:center;padding:40px;color:var(--text-muted)">暂无任务</div>';
+}
+
+function switchTaskTab(tab, el) {
+  state.currentTaskTab = tab;
+  document.querySelectorAll('.task-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTasks();
+}
+
+function toggleTask(e, id, btn) {
+  e.stopPropagation();
+  state.taskCheckStates[id] = !state.taskCheckStates[id];
+  if (state.taskCheckStates[id]) {
+    showToast('🎉 任务完成！获得成就+1');
+  }
+  renderTasks();
+}
+
+function openTaskDetailById(id) {
+  const all = [...tasksData.micro, ...tasksData.formal, ...tasksData.theme];
+  const task = all.find(t => t.id === id);
+  if (task) openTaskDetail(task);
+}
+
+function openTaskDetail(task) {
+  state.currentTaskDetail = task;
+  document.getElementById('td-title').textContent = task.title;
+  document.getElementById('td-meta').textContent = `${task.type} · ${task.duration}`;
+  const isDone = state.taskCheckStates[task.id] || false;
+
+  let stepsHtml = '';
+  if (task.steps) {
+    stepsHtml = `
+      <div class="td-section">
+        <div class="td-section-title">📋 执行步骤</div>
+        <div class="step-list">
+          ${task.steps.map((s, i) => `
+            <div class="step-item">
+              <div class="step-num ${i < 2 && isDone ? 'done' : ''}">${i < 2 && isDone ? '✓' : i+1}</div>
+              <div class="step-text">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  } else if (task.days) {
+    stepsHtml = `
+      <div class="td-section">
+        <div class="td-section-title">📅 每日安排</div>
+        <div class="step-list">
+          ${task.days.map((d, i) => `
+            <div class="step-item">
+              <div class="step-num">${i+1}</div>
+              <div class="step-text">${d}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const tagsHtml = (task.tags || []).map(t => `<span class="badge badge-primary">${t}</span>`).join('');
+  const diffDots = [1,2,3].map(n => `<div class="task-difficulty-dot ${n <= task.difficulty ? 'active' : ''}"></div>`).join('');
+
+  document.getElementById('td-content').innerHTML = `
+    <div class="td-section">
+      <div class="td-section-title">📖 任务说明</div>
+      <div style="font-size:var(--font-base);color:var(--text-primary);line-height:1.7;margin-bottom:12px">${task.desc}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${tagsHtml}</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:var(--font-xs);color:var(--text-muted)">
+          难度<div class="task-difficulty" style="display:flex;gap:2px;margin-left:4px">${diffDots}</div>
+        </div>
+      </div>
+    </div>
+    ${stepsHtml}
+    <div class="checkin-area ${isDone ? 'checked' : ''}" onclick="checkInTask(${task.id})">
+      <div class="checkin-icon">${isDone ? '🎉' : '✋'}</div>
+      <div class="checkin-title">${isDone ? '已完成打卡！' : '完成打卡'}</div>
+      <div class="checkin-desc">${isDone ? '你做到了，继续保持！' : '点击标记今日任务完成'}</div>
+    </div>
+    <div style="height:8px"></div>
+  `;
+  showPage('task-detail');
+  document.getElementById('bottom-nav').classList.add('visible');
+}
+
+function checkInTask(id) {
+  state.taskCheckStates[id] = !state.taskCheckStates[id];
+  if (state.taskCheckStates[id]) {
+    showToast('🎉 打卡成功！继续加油！');
+  }
+  // Re-render detail
+  const all = [...tasksData.micro, ...tasksData.formal, ...tasksData.theme];
+  const task = all.find(t => t.id === id);
+  if (task) openTaskDetail(task);
+}
+
+function backFromTaskDetail() {
+  if (state.currentTab === 'tasks') {
+    showPage('tasks');
+    renderTasks();
+  } else {
+    switchTab('home');
+  }
+}
+
+// ==================== AI Chat ====================
+function goAIChat() {
+  state.prevTab = state.currentTab;
+  showPage('ai-chat');
+  document.getElementById('bottom-nav').classList.add('visible');
+}
+
+function backFromAIChat() {
+  switchTab(state.prevTab || 'home');
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChat();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chat-input').value = text;
+  sendChat();
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || state.aiTyping) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+  state.aiTyping = true;
+  setTimeout(() => {
+    addAIMessage(text);
+    state.aiTyping = false;
+  }, 900 + Math.random() * 600);
+}
+
+function addUserMessage(text) {
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  const el = document.createElement('div');
+  el.className = 'chat-bubble-wrap me animate-in';
+  el.innerHTML = `
+    <div class="chat-avatar user-av">🙋</div>
+    <div>
+      <div class="chat-bubble user">${escapeHtml(text)}</div>
+      <div class="chat-bubble-time">${time}</div>
+    </div>
+  `;
+  const container = document.getElementById('chat-messages');
+  container.appendChild(el);
+  scrollChatBottom();
+}
+
+function addAIMessage(userText) {
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  let response = aiResponses[userText];
+  if (!response) {
+    // Generic context-aware responses
+    const lc = userText.toLowerCase();
+    if (lc.includes('成绩') || lc.includes('学习') || lc.includes('作业')) {
+      response = '关于学习问题，建议先了解孩子对学习的感受，再谈如何改进。\n\n试着问："你觉得现在学习最难的是什么？" 而不是 "你怎么又没完成作业"\n\n要我帮你模拟这段对话吗？🎭';
+    } else if (lc.includes('沟通') || lc.includes('说话')) {
+      response = '好的沟通有一个重要原则：**先连接，再纠正**。\n\n在批评或建议之前，先确认孩子的情绪：\n"我看到你很沮丧" → "能告诉我发生了什么吗？"\n\n这样孩子才会愿意听你后续说的话 💬';
+    } else if (lc.includes('情绪') || lc.includes('发脾气') || lc.includes('哭')) {
+      response = '孩子的情绪爆发往往是在说：**"我需要帮助，但我不知道怎么说"**\n\n首要任务是帮孩子命名情绪：\n"你现在是感到愤怒？还是委屈？"\n\n情绪有了名字，就会减小50%的强度 🌊';
+    } else {
+      response = '这是个很重要的问题！根据你的测评数据，我建议从以下角度思考：\n\n• 这个情况背后孩子真正的需求是什么？\n• 你自己的情绪是否影响了回应方式？\n• 你们之前有没有类似的正面解决案例可以借鉴？\n\n需要更具体的建议，可以告诉我更多细节 💡';
+    }
+  }
+  // Convert markdown-style bold to HTML
+  response = response.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  const el = document.createElement('div');
+  el.className = 'chat-bubble-wrap animate-in';
+  el.innerHTML = `
+    <div class="chat-avatar ai-av">🤖</div>
+    <div>
+      <div class="chat-bubble ai">${response}</div>
+      <div class="chat-bubble-time">${time}</div>
+    </div>
+  `;
+  const container = document.getElementById('chat-messages');
+  container.appendChild(el);
+  scrollChatBottom();
+}
+
+function scrollChatBottom() {
+  const container = document.getElementById('chat-messages');
+  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ==================== Init ====================
+document.addEventListener('DOMContentLoaded', function() {
+  updateTime();
+  // Start on onboarding
+  showPage('onboarding');
+  document.getElementById('bottom-nav').classList.remove('visible');
+});
+
+</script>
+</body>
+</html>
